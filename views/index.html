@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Project Front Page</title>
+    <link href="/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background-color: #fcfaed;
+        }
+        .icon-image {
+            max-width: 300px; /* Adjust the maximum width as needed */
+            height: auto;
+        }
+        .small-font {
+            font-size: 10px; /* Adjust the font size as needed */
+        }
+        .panel {
+            background-color: rgba(223, 255, 211, 0.56);
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 10px;
+            width: 200px;
+            text-align: center;
+        }
+        .panel-container {
+            display: flex; /* Display panels horizontally */
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+<div class="text-center">
+    <img src="Design.gif" alt="Header Image" class="img-fluid">
+</div>
+<div class="container my-5 text-center">
+    <h2 class="mb-4">Welcome to the Event Management System</h2>
+    <div class="panel-container">
+        <div class="panel">
+            <h2><%= currentEventsCounter %></h2>
+            <p>Events</p>
+        </div>
+        <div class="panel">
+            <h2><%= currentCategoryCounter %></h2>
+            <p>Categories</p>
+        </div>
+        <div class="panel">
+            <h2><%= recordsCreated %></h2>
+            <p>Records Created</p>
+        </div>
+        <div class="panel">
+            <h2><%= recordsDeleted %></h2>
+            <p>Records Deleted</p>
+        </div>
+        <div class="panel">
+            <h2><%= recordsUpdated %></h2>
+            <p>Records Updated</p>
+        </div>
+    </div>
+
+    <h2 class="mt-5 mb-4">Task Group 1 (student#1)</h2>
+    <p>Carter Chin 32418361</p>
+    <div class="d-flex justify-content-center">
+        <a href="/category/32418361/add" class="btn btn-info mr-3">Add Category</a>
+        <a href="/category/32418361/listall" class="btn btn-info mr-3">List all categories</a>
+        <a href="/category/32418361/search-category?keyword=default" class="btn btn-info mr-3">List categories by keyword</a>
+        <a href="/32418361/event/ZGO-8579" class="btn btn-info mr-3">Show Event Details</a>
+        <a href="/category/32418361/delete-category" class="btn btn-info mr-3">Delete Category By ID</a>
+    </div>
+
+    <h2 class="mt-5 mb-4">Task Group 2 (student#2)</h2>
+    <p>Zecan Liu 25348914</p>
+    <div class="d-flex justify-content-center">
+        <a href="/zecan/event/add" class="btn btn-info mr-3">Add Event</a>
+        <a href="/zecan/event/listall" class="btn btn-info mr-3">List all events</a>
+        <a href="/zecan/event/listsoldout" class="btn btn-info mr-3">List Sold Out events</a>
+        <a href="/zecan/category" class="btn btn-info mr-3">Category Detail Page</a>
+        <a href="/zecan/event/remove" class="btn btn-info mr-3">Delete Event By ID</a>
+    </div>
+</div>
+
+
+<div class="text-center">
+    <h5 class="mb-4">Developed by: Zecan Liu & Carter Chin</h5>
+    <img src="/team_icon.png" alt="Team icon" class="img-fluid icon-image">
+    <p class="small-font">All images are AI generated</p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: controllers/event-controller.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: controllers/event-controller.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @module event-controller
+ * @description This module contains functions for managing events, including creation, retrieval, deletion, and updating.
+ *
+ */
+const Event = require("../models/event");
+const Category = require("../models/category_schema");
+const Counter = require("../models/counter");
+
+/**
+ * Create an event
+ * @function
+ * @param {object} req - The HTTP request object containing event data.
+ * @param {object} res - The HTTP response object used to send a response.
+ * @returns {Promise&lt;void>} A promise that resolves when the event is successfully created.
+ */
+async function createEvent(req, res) {
+    // Extract event data from the request.
+    let obj = req.body;
+
+    // Parse category IDs from the 'categories' field.
+    let categoryIds = [];
+    for (let i = 0; i &lt; obj.categories.length; i++) {
+        if (obj.categories[i] === ',') {
+            categoryIds = obj.categories.split(',');
+            break;
+        }
+    }
+
+    // If categoryIds is still an empty array, add the single category.
+    categoryIds === [] ? categoryIds.push(obj.categories) : categoryIds;
+    let categories = await Category.find({categoryID: { $in: categoryIds }});
+
+    try {
+        // Create a new event in the database.
+        let anEvent = await Event.create({
+            name: obj.name,
+            description: obj.description,
+            categories: categoryIds,
+            categoryList: categories.map(category => category._id), // Store the category IDs (not the category objects
+            startDate: obj.startDateTime,
+            duration: obj.durationInMinutes,
+            image: obj.image,
+            capacity: obj.capacity,
+            ticketsAvailable: obj.ticketsAvailable,
+            isActive: obj.isActive
+        });
+        // Update associated categories with this event.
+        await Category.updateMany(
+            { categoryID: { $in: categoryIds } },
+            { $push: { eventsList: anEvent._id } }
+        );
+
+        // Increment the event counter.
+        await Counter.findOneAndUpdate(
+            {},
+            { $inc: { addCount: 1, eventsCount: 1 } },
+        );
+
+        // Respond with the newly created event's ID.
+        res.json({ eventId: anEvent.eventID });
+    } catch (err) {
+        // Handle errors and send an error response.
+        res.status(500).json({ error: err });
+    }
+}
+
+/**
+ * Get all events in the database
+ * @function
+ * @param {object} req - The HTTP request object (not used in this function).
+ * @param {object} res - The HTTP response object used to send a list of events.
+ * @returns {Promise&lt;void>} A promise that resolves with the list of events.
+ */
+async function getAllEvents(req, res) {
+    try {
+        // Retrieve all events from the database and populate their categories.
+        const events = await Event.find().populate('categoryList');
+
+        // Respond with the list of events.
+        res.json(events);
+    } catch (err) {
+        // Handle errors and send an error response.
+        res.status(500).json({ error: err });
+    }
+}
+
+/**
+ * Delete event by event ID
+ * @function
+ * @param {object} req - The HTTP request object containing the event ID to delete.
+ * @param {object} res - The HTTP response object used to send a status message.
+ * @returns {Promise&lt;void>} A promise that resolves with a status message after the event is deleted.
+ */
+async function deleteEventById(req, res) {
+    try {
+        // Find the event to delete by event ID.
+        let event = await Event.findOne({ eventID: req.body.eventId });
+
+        if (!event) {
+            // If the event is not found, send a status message.
+            res.json({ status: 'Event not found' });
+            return;
+        }
+
+        // Update associated categories to remove the event reference.
+        await Category.updateMany(
+            { _id: { $in: event.categoryList } },
+            { $pull: { eventsList: event._id } }
+        );
+
+        // Delete the event from the database.
+        await Event.deleteOne({ eventID: event.eventID });
+
+        // Decrement the event counter.
+        await Counter.findOneAndUpdate(
+            {},
+            { $inc: { deleteCount: 1, eventsCount: -1 } },
+        );
+
+        // Respond with a status message indicating successful deletion.
+        res.json({ acknowledged: true, deletedCount: 1 });
+    } catch (err) {
+        // Handle errors and send an error response.
+        res.status(500).json({ error: err });
+    }
+}
+
+/**
+ * Update event by event ID
+ * @function
+ * @param {object} req - The HTTP request object containing updated event data and event ID.
+ * @param {object} res - The HTTP response object used to send a status message.
+ * @returns {Promise&lt;void>} A promise that resolves with a status message after the event is updated.
+ */
+async function updateEventById(req, res) {
+    try {
+        // Extract updated event data and event ID from the request.
+        let obj = req.body;
+
+        // Find and update the event by event ID.
+        const updatedEvent = await Event.findOneAndUpdate(
+            { eventID: obj.eventId },
+            { name: obj.name, capacity: obj.capacity },
+            { new: true }
+        );
+
+        if (!updatedEvent) {
+            // If the event is not found, send a status message.
+            res.json({ status: 'Event not found' });
+            return;
+        }
+
+        // Increment the update counter.
+        await Counter.findOneAndUpdate(
+            {},
+            { $inc: { updateCount: 1 } },
+        );
+
+        // Respond with a status message indicating successful update.
+        res.json({ status: 'Update successfully' });
+    } catch (err) {
+        // Handle errors and send an error response.
+        res.status(500).json({ error: err });
+    }
+}
+
+// Export the functions for use in other modules.
+module.exports = {
+    createEvent,
+    getAllEvents,
+    deleteEventById,
+    updateEventById
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-ExpressServer.html">ExpressServer</a></li><li><a href="module-category-controller.html">category-controller</a></li><li><a href="module-event-controller.html">event-controller</a></li><li><a href="module-event-router.html">event-router</a></li></ul><h3>Classes</h3><ul><li><a href="global.html#Category">Category</a></li><li><a href="CounterSchema.html">CounterSchema</a></li><li><a href="EventSchema.html">EventSchema</a></li></ul><h3>Global</h3><ul><li><a href="global.html#GET/32418361/search-category">GET /32418361/search-category</a></li><li><a href="global.html#GET/category/32418361/add">GET /category/32418361/add</a></li><li><a href="global.html#GET/category/32418361/delete-category">GET /category/32418361/delete-category</a></li><li><a href="global.html#GET/category/32418361/listall">GET /category/32418361/listall</a></li><li><a href="global.html#POST/category/32418361/listall">POST /category/32418361/listall</a></li><li><a href="global.html#VIEWS_PATH">VIEWS_PATH</a></li><li><a href="global.html#app">app</a></li><li><a href="global.html#categoryDatabase">categoryDatabase</a></li><li><a href="global.html#convertMinutesToHoursAndMinutes">convertMinutesToHoursAndMinutes</a></li><li><a href="global.html#express">express</a></li><li><a href="global.html#generateEventID">generateEventID</a></li><li><a href="global.html#generateId">generateId</a></li><li><a href="global.html#path">path</a></li><li><a href="global.html#router">router</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri Sep 15 2023 13:49:43 GMT+1000 (Australian Eastern Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

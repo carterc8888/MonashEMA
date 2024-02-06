@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Page</title>
+    <link href="/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        .header-image {
+            width: 105%;
+            max-width: none;
+            height: auto;
+        }
+
+        .event-card {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(15, 10, 10, 0.1);
+        }
+
+        .event-card h3 {
+            margin-top: 0;
+        }
+
+        .event-card .attribute {
+            margin: 5px 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <% for (let i = 0; i < events.length; i++) { %>
+        <div class="text-center">
+            <!-- Use the image path from the first event for the header image -->
+            <img src="<%= events[i].image !== '' ? (events[i].image.startsWith('/') ? events[i].image : '/' + events[i].image) : '/Event.png' %>" alt="Event" class="img-fluid header-image">
+            <h1 class="text-center mb-4">Event Details</h1>
+        </div>
+        <div class="event-card">
+            <div class="attribute">Event Name: <%= events[i].name %></div>
+            <div class="attribute">ID: <%= events[i].eventID %></div>
+            <div class="attribute">Description: <%= events[i].description %></div>
+            <div class="attribute">Start: <%= formatDate(events[i].startDate) %></div>
+            <div class="attribute">End: <%= formatDate(events[i].endDate) %></div>
+            <div class="attribute">Duration: <%= formatDuration(calculateDuration(events[i].startDate, events[i].endDate)) %></div>
+            <div class="attribute">Is Active: <%= events[i].isActive %></div>
+            <div class="attribute">Capacity: <%= events[i].capacity %></div>
+            <div class="attribute">Tickets Available: <%= events[i].ticketsAvailable %></div>
+            <div class="attribute">Category ID: <%= events[i].categoryID %></div>
+        </div>
+    <% } %>
+
+    <%
+    function formatDate(dateString) {
+        const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true };
+        return new Date(dateString).toLocaleString('en-US', options);
+    }
+    
+    function formatDuration(durationInMinutes) {
+        const hours = Math.floor(durationInMinutes / 60);
+        const minutes = durationInMinutes % 60;
+        if (hours > 0 && minutes > 0) {
+            return `${hours} hours ${minutes} minutes`;
+        } else if (hours > 0) {
+            return `${hours} hours`;
+        } else {
+            return `${minutes} minutes`;
+        }
+    }
+    
+    function calculateDuration(startDate, endDate) {
+        const diffInMilliseconds = new Date(endDate) - new Date(startDate);
+        const durationInMinutes = diffInMilliseconds / (1000 * 60); // Convert milliseconds to minutes
+        return durationInMinutes;
+    }
+     %>
+</div>
+</body>
+</html>

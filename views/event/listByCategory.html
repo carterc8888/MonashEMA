@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Category Page</title>
+  <link href="/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    /* Adjust table width and cell widths for a nicer appearance */
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      padding: 8px;
+      border: 1px solid #ddd;
+      text-align: center;
+      font-size: 13px;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .header-image {
+      width: 105%; /* Increase the width of the image */
+      max-width: none; /* Remove max-width restriction */
+      height: auto; /* Allow the height to adjust automatically */
+    }
+
+
+    .form-container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-row {
+      margin-bottom: 15px;
+    }
+
+    .form-label {
+      font-weight: bold;
+    }
+
+    .form-data {
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 3px;
+    }
+
+  </style>
+</head>
+<body>
+<div class="container mt-5">
+  <div class="text-center">
+    <% if (categoryInfo.image.length !== 0) { %>
+      <img src="<%= categoryInfo.image %>" alt="Header Image" class="img-fluid header-image">
+    <% } else { %>
+      <img src="/Category.png" alt="Default Header Image" class="img-fluid header-image">
+    <% } %>
+    <h1 class="text-center mb-4"><%= categoryInfo.name%></h1>
+
+  </div>
+
+  <div class="form-container">
+    <div class="form-row">
+      <span class="form-label">Category Id:</span>
+      <div class="form-data"><%= categoryInfo.categoryID%></div>
+    </div>
+    <div class="form-row">
+      <span class="form-label">Name:</span>
+      <div class="form-data"><%= categoryInfo.name%></div>
+    </div>
+    <div class="form-row">
+      <span class="form-label">Description:</span>
+      <div class="form-data"><%= categoryInfo.description%></div>
+    </div>
+    <div class="form-row">
+      <span class="form-label">Created Date Time:</span>
+      <div class="form-data"><%= categoryInfo.createdAt%></div>
+    </div>
+  </div>
+
+  <table class="table table-bordered">
+    <thead class="thead-light">
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Start</th>
+      <th>End</th>
+      <th>Duration</th>
+      <th>Is Active</th>
+      <th>Capacity</th>
+      <th>Tickets Available</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% for (let i = 0; i < events.length; i++) { %>
+    <tr>
+      <td><%= events[i].eventID %></td>
+      <td><%= events[i].name %></td>
+      <td><%= events[i].startDate %></td>
+      <td><%= events[i].endDate %></td>
+      <td><%= events[i].displayDuration %></td>
+      <td>
+        <% if (events[i].isActive) { %>
+        <span>&#10004;</span> <!-- Unicode character for a tick mark -->
+        <% } %>
+      </td>
+      <td><%= events[i].capacity %></td>
+      <td><%= events[i].ticketsAvailable %></td>
+      <td><a href="/32418361/event/<%= events[i].eventID %>" class="btn btn-primary">View</a></td>
+    </tr>
+    <% } %>
+    </tbody>
+  </table>
+</div>
+
+
+</body>
+</html>

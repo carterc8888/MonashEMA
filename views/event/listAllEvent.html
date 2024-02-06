@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event List</title>
+    <link href="/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        /* Adjust table width and cell widths for a nicer appearance */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: center;
+            font-size: 13px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .header-image {
+            width: 105%; /* Increase the width of the image */
+            max-width: none; /* Remove max-width restriction */
+            height: auto; /* Allow the height to adjust automatically */
+        }
+
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <div class="text-center">
+        <img src="/Design.gif" alt="Header GIF" class="img-fluid header-image">
+        <h1 class="text-center mb-4">Event List</h1>
+    </div>
+
+    <table class="table table-bordered">
+        <thead class="thead-light">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Duration</th>
+            <th>Is Active</th>
+            <th>Capacity</th>
+            <th>Tickets Available</th>
+            <th>Category ID</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% for (let i = 0; i < events.length; i++) { %>
+        <tr>
+            <td><%= events[i].eventID %></td>
+            <td><%= events[i].name %></td>
+            <td><%= events[i].startDate %></td>
+            <td><%= events[i].endDate %></td>
+            <td><%= events[i].displayDuration %></td>
+
+            <td>
+                <% if (events[i].isActive) { %>
+                <span>&#10004;</span> <!-- Unicode character for a tick mark -->
+                <% } %>
+            </td>
+
+            <!--            <td><%= events[i].isActive %></td>-->
+            <td><%= events[i].capacity %></td>
+            <td><%= events[i].ticketsAvailable %></td>
+            <td><%= events[i].categories %></td>
+            <td><a href="/32418361/event/<%= events[i].eventID %>" class="btn btn-primary">View</a></td>
+        </tr>
+        <% } %>
+        </tbody>
+    </table>
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: models/event.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: models/event.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const mongoose = require('mongoose');
+
+/**
+ * @class EventSchema
+ * @property {string} eventID - Unique identifier for the event.
+ * @property {string} name - Name of the event.
+ * @property {Date} startDate - Start date and time of the event.
+ * @property {number} duration - Duration of the event in minutes.
+ * @property {string} displayDuration - Duration of the event in human-readable format.
+ * @property {Date} endDate - End date and time of the event.
+ * @property {string} description - Description of the event.
+ * @property {boolean} isActive - Indicates whether the event is active.
+ * @property {string} image - URL or path to the event's image.
+ * @property {number} capacity - Maximum capacity for the event.
+ * @property {number} ticketsAvailable - Number of tickets available for the event.
+ * @property {mongoose.Schema.Types.ObjectId[]} categoryList - List of category _ids .
+ * @property {string[]} categories - List of category ids.
+ */
+
+const eventSchema = new mongoose.Schema({
+    eventID: String,
+    name: {
+        type: String,
+        required: true
+    },
+    startDate: {
+        type: Date,
+        required: true
+    },
+    duration: {
+        type: Number,
+        required: true
+    },
+    displayDuration: String,
+    endDate: Date,
+    description: String,
+    isActive: Boolean,
+    image: {
+        type: String,
+        default: ""
+    },
+    capacity: {
+        type: Number,
+        min: 10,
+        max: 2000,
+        default: 1000
+    },
+    ticketsAvailable: Number,
+    categoryList: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }],
+    categories: [{ type: String, required: true }]
+});
+
+/**
+ * Pre-save middleware to set the display duration, end date, event ID, and active status of the event.
+ * @function
+ * @memberof EventSchema
+ * @name pre-save
+ */
+eventSchema.pre('save', function (next) {
+    this.displayDuration = convertMinutesToHoursAndMinutes(this.duration);
+    this.endDate = new Date(this.startDate.getTime() + this.duration * 60000);
+    this.eventID = generateEventID();
+    this.isActive = true;
+    this.ticketsAvailable === '' ? this.capacity : this.ticketsAvailable; // Check if ticketsAvailable is empty and set capacity accordingly.
+    next();
+});
+
+/**
+ * Generate a unique event ID.
+ * @function
+ * @returns {string} - A unique event ID.
+ */
+function generateEventID() {
+    let res = '';
+    const characterSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let requireCapital = 3;
+    for (let i = 0; i &lt; requireCapital; i++) {
+        let randomIndex = Math.floor(Math.random() * characterSet.length);
+        res += characterSet[randomIndex];
+    }
+    const requireDigit = 4;
+    let randomDigits = Math.round(Math.random() * 10 ** requireDigit);
+    res += `-${randomDigits}`;
+    return res;
+}
+
+/**
+ * Convert minutes to hours and minutes format.
+ * @function
+ * @param {number} minutes - Total minutes to be converted.
+ * @returns {string} - Converted time in hours and minutes format.
+ */
+function convertMinutesToHoursAndMinutes(minutes) {
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    return hours + ' hour(s) ' + remainingMinutes + ' minutes';
+}
+
+module.exports = mongoose.model('Event', eventSchema);
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-ExpressServer.html">ExpressServer</a></li><li><a href="module-category-controller.html">category-controller</a></li><li><a href="module-event-controller.html">event-controller</a></li><li><a href="module-event-router.html">event-router</a></li></ul><h3>Classes</h3><ul><li><a href="global.html#Category">Category</a></li><li><a href="CounterSchema.html">CounterSchema</a></li><li><a href="EventSchema.html">EventSchema</a></li></ul><h3>Global</h3><ul><li><a href="global.html#GET/32418361/search-category">GET /32418361/search-category</a></li><li><a href="global.html#GET/category/32418361/add">GET /category/32418361/add</a></li><li><a href="global.html#GET/category/32418361/delete-category">GET /category/32418361/delete-category</a></li><li><a href="global.html#GET/category/32418361/listall">GET /category/32418361/listall</a></li><li><a href="global.html#POST/category/32418361/listall">POST /category/32418361/listall</a></li><li><a href="global.html#VIEWS_PATH">VIEWS_PATH</a></li><li><a href="global.html#app">app</a></li><li><a href="global.html#categoryDatabase">categoryDatabase</a></li><li><a href="global.html#convertMinutesToHoursAndMinutes">convertMinutesToHoursAndMinutes</a></li><li><a href="global.html#express">express</a></li><li><a href="global.html#generateEventID">generateEventID</a></li><li><a href="global.html#generateId">generateId</a></li><li><a href="global.html#path">path</a></li><li><a href="global.html#router">router</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri Sep 15 2023 13:49:43 GMT+1000 (Australian Eastern Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
